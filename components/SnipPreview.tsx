@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -17,7 +17,12 @@ function SnipPreview() {
         <div className="">Snipped Today by Brad</div>
       </div>
       <div className="my-1 rounded-xl">
-        <SyntaxHighlighter language="javascript" style={docco} className="rounded-xl">
+        <SyntaxHighlighter
+          language="javascript"
+          style={docco}
+          className="rounded-xl"
+          showLineNumbers={true}
+        >
           {codeString}
         </SyntaxHighlighter>
       </div>
