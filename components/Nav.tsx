@@ -1,15 +1,16 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { createClient, Session } from "@supabase/supabase-js";
+import { useSupabase } from "../app/supabase-provider";
+import { Session } from "@supabase/supabase-js";
+import AddSnip from "./AddSnip";
+import { useRouter } from "next/router";
 
 export default function Nav() {
   const [session, setSession] = useState<Session | null>(null);
   const [email, setEmail] = useState("");
-  const supabase = createClient(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}`,
-    `${process.env.NEXT_PUBLIC_SUPABASE_KEY}`
-  );
-  const handleSubmit = async (e: FormEvent) => {
+  const [addSnip, setAddSnip] = useState(false);
+  const { supabase } = useSupabase();
+  const signIn = async (e: FormEvent) => {
     e.preventDefault();
     const { data, error } = await supabase.auth.signInWithOtp({
       email: email,
@@ -17,6 +18,13 @@ export default function Nav() {
         emailRedirectTo: "https://example.com/welcome",
       },
     });
+  };
+
+  const signOut = async (e: FormEvent) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signOut();
+    const router = useRouter();
+    router.reload();
   };
 
   useEffect(() => {
@@ -29,10 +37,13 @@ export default function Nav() {
   }, []);
 
   return (
-    <nav className="flex justify-between items-end">
+    <nav className="flex justify-between items-end flex-wrap">
       <div className="text-2xl font-bold">Snip of the Day</div>
       {session ? (
-        <button>Add a Snip</button>
+        <div className="flex gap-3">
+          <button onClick={() => setAddSnip(!addSnip)}>Add a Snip</button>
+          <button onClick={(e) => signOut(e)}>Sign Out</button>
+        </div>
       ) : (
         <form className="">
           <label htmlFor="email" className="hidden">
@@ -46,11 +57,12 @@ export default function Nav() {
             type="text"
             placeholder="email"
           />
-          <button type="submit" onClick={(e) => handleSubmit(e)}>
-            sign in
+          <button type="submit" onClick={(e) => signIn(e)}>
+            Sign in
           </button>
         </form>
       )}
+      {addSnip && <AddSnip />}
     </nav>
   );
 }
