@@ -1,5 +1,12 @@
-import React from "react";
+'use client'
 
+import React from "react";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+
+const codeString = `const hello = () => {
+  console.log('hello')
+}`;
 function SnipPreview() {
   return (
     <div className="my-2">
@@ -9,8 +16,10 @@ function SnipPreview() {
         </h2>
         <div className="">Snipped Today by Brad</div>
       </div>
-      <div className="my-1 rounded-md bg-slate-800 p-6 text-white font-mono">
-        Code Snippet Goes Here
+      <div className="my-1 rounded-xl">
+        <SyntaxHighlighter language="javascript" style={docco} className="rounded-xl">
+          {codeString}
+        </SyntaxHighlighter>
       </div>
       <div className="flex justify-between items-end">
         <h2 className="">Show more</h2>
