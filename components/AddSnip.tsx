@@ -33,7 +33,6 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
     }
   };
 
-  const userName = "nobug";
   return (
     <form className="basis-full flex flex-col p-4 bg-teal-100 rounded-lg my-4">
       <div className="flex justify-between">
