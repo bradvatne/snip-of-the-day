@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { useSupabase } from "../app/supabase-provider";
+import { useSupabase } from "../app/browserClient";
 import { Session } from "@supabase/supabase-js";
 import AddSnip from "./AddSnip";
 
 export default function Nav() {
+  const [checkEmail, setCheckEmail] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<string | null>(null);
   const [email, setEmail] = useState("");
@@ -15,15 +16,14 @@ export default function Nav() {
     e.preventDefault();
     const { data, error } = await supabase.auth.signInWithOtp({
       email: email,
-      options: {
-        emailRedirectTo: "https://example.com/welcome",
-      },
     });
+    !error && setCheckEmail(true);
   };
 
   const signOut = async (e: FormEvent) => {
     e.preventDefault();
     const { error } = await supabase.auth.signOut();
+    setSession(null);
   };
 
   useEffect(() => {
@@ -46,13 +46,15 @@ export default function Nav() {
       onClick={() => console.log(user)}
     >
       <div className="text-2xl font-bold">Snip of the Day ✂️</div>
-      {session ? (
+      {session && !checkEmail ? (
         <div className="flex gap-3">
           <button onClick={() => setAddSnip(!addSnip)}>
             {addSnip ? "Close Snip Editor" : "Add New Snip"}
           </button>
           <button onClick={(e) => signOut(e)}>Sign Out</button>
         </div>
+      ) : checkEmail ? (
+        <div>Login Email Sent...</div>
       ) : (
         <form className="">
           <label htmlFor="email" className="hidden">
@@ -71,7 +73,7 @@ export default function Nav() {
           </button>
         </form>
       )}
-      {addSnip && <AddSnip session={session} user={user}/>}
+      {addSnip && <AddSnip session={session} user={user} />}
     </nav>
   );
 }

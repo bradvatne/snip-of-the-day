@@ -1,7 +1,7 @@
 import "./globals.css";
 import Nav from "../components/Nav";
 import SnipPreview from "../components/SnipPreview";
-import SupabaseProvider from "./supabase-provider";
+import SupabaseProvider from "./browserClient";
 
 export const metadata = {
   title: "Create Next App",
@@ -20,7 +20,6 @@ export default function RootLayout({
           <div className="max-w-xl mx-auto">
             <Nav />
             {children}
-            <SnipPreview />
           </div>
         </SupabaseProvider>
       </body>
