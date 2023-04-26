@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { useSupabase } from "../app/browserClient";
+import { useSupabase } from "../utils/browserClient";
 import { Session } from "@supabase/supabase-js";
-import AddSnip from "./AddSnip";
+import AddSnip from "./add-snip";
 
 export default function Nav() {
   const [checkEmail, setCheckEmail] = useState(false);
@@ -10,7 +10,7 @@ export default function Nav() {
   const [user, setUser] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [addSnip, setAddSnip] = useState(false);
-  const { supabase } = useSupabase();
+  const supabase = useSupabase();
 
   const signIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,15 +29,18 @@ export default function Nav() {
   useEffect(() => {
     const fetchSession = async () => {
       const { data, error } = await supabase.auth.getSession();
-      error ? console.log(error) : setSession(data.session);
+      if (data !== null) {
+        setSession(data.session);
+        const res = await supabase
+          .from("profiles")
+          .select()
+          .eq("id", data && data.session && data.session.user.id)
+          .single();
+        setUser(res && res.data && res.data && res.data.first_name);
+        console.log(res, "here");
+      }
     };
-    const fetchUser = async () => {
-      const { data, error } = await supabase.from("profiles").select().single();
-      error ? console.log(error) : setUser(data.first_name);
-    };
-
     fetchSession();
-    fetchUser();
   }, []);
 
   return (
@@ -73,7 +76,14 @@ export default function Nav() {
           </button>
         </form>
       )}
-      {addSnip && <AddSnip session={session} user={user} />}
+      {addSnip && (
+        <AddSnip
+          session={session}
+          user={user}
+          addSnip={addSnip}
+          setAddSnip={setAddSnip}
+        />
+      )}
     </nav>
   );
 }

@@ -1,12 +1,15 @@
 import supabase from "../lib/supabase";
-import SnipPreview from "../components/SnipPreview";
+import SnipPreview from "../ui/snip-preview";
+
+export const revalidate = 0;
 
 export default async function Home() {
-  const { data, error } = await supabase.from("snips").select();
+  const { data, error } = await supabase
+    .from("snips")
+    .select()
+    .order("id", { ascending: false });
   return (
-    <div>
-      {data &&
-        data.map((snip, index) => <SnipPreview key={index} snippet={snip} />)}
-    </div>
+    data &&
+    data.map((snip: any) => <SnipPreview key={snip.id} snippet={snip} />)
   );
 }

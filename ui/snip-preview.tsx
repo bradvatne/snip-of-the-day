@@ -1,13 +1,9 @@
 "use client";
 
 import { Snip } from "@/lib/database";
-import React, { useState } from "react";
+import React, { useState, useEffect, cache } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-
-const codeString = `const hello = () => {
-  console.log('hello')
-}`;
 
 type SnipPreviewProps = {
   snippet: Snip;
@@ -27,10 +23,10 @@ function SnipPreview({ snippet }: SnipPreviewProps) {
   const [showMore, setShowMore] = useState(false);
 
   return (
-    <div className="my-2">
+    <div className="my-5">
       <div className="flex justify-between items-end">
-        <h2 className="font-semibold">{title}</h2>
-        <div className="">Snipped {formatDate(date)} by Brad</div>
+        <h2 className="font-semibold text-lg">{title}</h2>
+        <div className="text-xs">Snipped {formatDate(date)} by Brad</div>
       </div>
       <div className="my-1 rounded-xl">
         <SyntaxHighlighter
@@ -44,10 +40,13 @@ function SnipPreview({ snippet }: SnipPreviewProps) {
       </div>
       {showMore && <div className="basis-full">{description}</div>}
       <div className="flex justify-between items-end">
-        <button className="" onClick={() => setShowMore(!showMore)}>
+        <button
+          className="text-xs hover:text-indigo-300"
+          onClick={() => setShowMore(!showMore)}
+        >
           Show {showMore ? "less" : "More"}
         </button>
-        <div className="flex gap-3">
+        <div className="flex gap-3 text-xs ">
           <button>Comment</button>
           <button>Like</button>
           <button>Share</button>

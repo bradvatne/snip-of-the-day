@@ -1,19 +1,29 @@
+"use client";
+
 import React from "react";
 import { useState, useEffect } from "react";
-import { useSupabase } from "../app/browserClient";
+import { useSupabase } from "../utils/browserClient";
 import { Session } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 type AddSnipProps = {
   session: Session | null;
   user: string | null;
+  addSnip: boolean | null;
+  setAddSnip: Function;
 };
 
-const AddSnip = ({ session, user }: AddSnipProps) => {
-  const { supabase } = useSupabase();
+type User = {
+  first_name: string;
+};
+
+const AddSnip = ({ setAddSnip, user }: AddSnipProps) => {
+  const supabase = useSupabase();
   const [title, setTitle] = useState("");
   const [snip, setSnip] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +32,7 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
       snip,
       description,
       language,
-      owner_id: session?.user.id,
+      owner_id: "Brad",
     });
     error ? console.log(error) : console.log("success!", data);
     if (!error) {
@@ -30,13 +40,17 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
       setSnip("");
       setDescription("");
       setLanguage("");
+      setAddSnip(false);
+      router.refresh();
     }
   };
 
   return (
     <form className="basis-full flex flex-col p-4 bg-teal-100 rounded-lg my-4">
       <div className="flex justify-between">
-        <label htmlFor="title">Title</label>
+        <label className="text-xs font-semibold" htmlFor="title">
+          Title
+        </label>
         <div>0/60</div>
       </div>
       <input
@@ -49,7 +63,9 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
         placeholder="Title your snippet here..."
       ></input>
       <div className="flex justify-between">
-        <label htmlFor="snip">Code Snippet</label>
+        <label className="text-xs font-semibold" htmlFor="snip">
+          Code Snippet
+        </label>
         <div>0/500</div>
       </div>
       <textarea
@@ -61,7 +77,9 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
         placeholder="Paste your snippet here..."
       ></textarea>
       <div className="flex justify-between">
-        <label htmlFor="description">Description</label>
+        <label className="text-xs font-semibold" htmlFor="description">
+          Description
+        </label>
         <div>0/5000</div>
       </div>
       <textarea
@@ -79,7 +97,9 @@ const AddSnip = ({ session, user }: AddSnipProps) => {
           `Posting as ${user}`
         )}
         <div className="flex gap-3 items-end">
-          <label htmlFor="language">Language:</label>
+          <label className="text-xs font-semibold" htmlFor="language">
+            Language:
+          </label>
           <select
             className="p-1 rounded"
             onChange={(e) => setLanguage(e.target.value)}

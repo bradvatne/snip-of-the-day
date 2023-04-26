@@ -1,7 +1,6 @@
 import "./globals.css";
-import Nav from "../components/Nav";
-import SnipPreview from "../components/SnipPreview";
-import SupabaseProvider from "./browserClient";
+import Nav from "../ui/nav";
+import SupabaseProvider from "../utils/browserClient";
 
 export const metadata = {
   title: "Create Next App",
