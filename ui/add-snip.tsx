@@ -17,23 +17,38 @@ type User = {
   first_name: string;
 };
 
-const AddSnip = ({ setAddSnip, user }: AddSnipProps) => {
+const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
   const supabase = useSupabase();
   const [title, setTitle] = useState("");
   const [snip, setSnip] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("");
+  const [author, setAuthor] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (session === null) {
+      alert("Please login to add a snippet");
+      return;
+    }
     const { data, error } = await supabase.from("snips").insert({
       title,
       snip,
       description,
       language,
-      owner_id: "Brad",
+      owner_id: session?.user.id,
+      author,
     });
+    if (!user && session !== null) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ first_name: author })
+        .eq("id", session.user.id);
+
+      error ? console.log(error) : console.log("updated name", data);
+    }
+
     error ? console.log(error) : console.log("success!", data);
     if (!error) {
       setTitle("");
@@ -92,7 +107,14 @@ const AddSnip = ({ setAddSnip, user }: AddSnipProps) => {
       ></textarea>
       <div className="flex justify-between items-end">
         {user === null ? (
-          <input type="text" className="rounded p-1" />
+          <input
+            type="text"
+            className="rounded p-1"
+            name="author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Enter your name..."
+          />
         ) : (
           `Posting as ${user}`
         )}

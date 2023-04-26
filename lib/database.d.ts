@@ -9,6 +9,58 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      comments: {
+        Row: {
+          author: string;
+          content: string;
+          created_at: string;
+          id: number;
+          owner_id: string | null;
+          snip_id: number | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          author: string;
+          content: string;
+          created_at?: string;
+          id?: number;
+          owner_id?: string | null;
+          snip_id?: number | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          author?: string;
+          content?: string;
+          created_at?: string;
+          id?: number;
+          owner_id?: string | null;
+          snip_id?: number | null;
+          updated_at?: string | null;
+        };
+      };
+      likes: {
+        Row: {
+          created_at: string;
+          id: number;
+          owner_id: string | null;
+          snip_id: number | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          owner_id?: string | null;
+          snip_id?: number | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          owner_id?: string | null;
+          snip_id?: number | null;
+          updated_at?: string | null;
+        };
+      };
       profiles: {
         Row: {
           first_name: string | null;
@@ -28,6 +80,7 @@ export interface Database {
       };
       snips: {
         Row: {
+          author: string | null;
           created_at: string | null;
           description: string;
           id: number;
@@ -38,6 +91,7 @@ export interface Database {
           updated_at: string | null;
         };
         Insert: {
+          author?: string | null;
           created_at?: string | null;
           description: string;
           id?: number;
@@ -48,6 +102,7 @@ export interface Database {
           updated_at?: string | null;
         };
         Update: {
+          author?: string | null;
           created_at?: string | null;
           description?: string;
           id?: number;
@@ -73,5 +128,5 @@ export interface Database {
     };
   };
 }
-
 export type Snip = Database["public"]["Tables"]["snips"]["Row"];
+export type Comment = Database["public"]["Tables"]["comments"]["Row"];
