@@ -130,3 +130,10 @@ export interface Database {
 }
 export type Snip = Database["public"]["Tables"]["snips"]["Row"];
 export type Comment = Database["public"]["Tables"]["comments"]["Row"];
+
+type SnipsResponse = Awaited<ReturnType<typeof getSnips>>;
+type SnipsResponseSuccess = SnipsResponse["data"] & {
+  comments: Comments[];
+};
+
+export type SnipWithComments = SnipsResponseSuccess;

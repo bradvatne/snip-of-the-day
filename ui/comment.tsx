@@ -52,7 +52,7 @@ const Comment = ({
   };
   return (
     <div className="my-2">
-      <div className="flex">
+      <div className="flex flex-col">
         <textarea
           name="comment"
           value={comment}
@@ -61,12 +61,15 @@ const Comment = ({
           placeholder="Add your comment..."
           disabled={session === null ? true : false}
         ></textarea>
-        <button
-          className="bg-green-100 px-5 rounded justify-self-end ml-2"
-          onClick={() => submitComment()}
-        >
-          Post
-        </button>
+        <div className="flex justify-between">
+          <span>Posting as {author}</span>{" "}
+          <button
+            className="px-5 rounded justify-self-end ml-2"
+            onClick={() => submitComment()}
+          >
+            Post
+          </button>
+        </div>
       </div>
       {comments.map((comment) => (
         <div key={comment.id}>
