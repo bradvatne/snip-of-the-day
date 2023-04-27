@@ -128,6 +128,7 @@ const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
             value={language}
           >
             <option value="Javascript">Javascript</option>
+            <option value="Typescript">Typescript</option>
           </select>
           <button
             onClick={(e) => handleSubmit(e)}

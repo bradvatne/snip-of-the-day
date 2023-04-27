@@ -58,7 +58,7 @@ function SnipPreview({ snippet, comments }: SnipPreviewProps) {
       </div>
       <div className="my-1 rounded-xl">
         <SyntaxHighlighter
-          language="javascript"
+          language="typescript"
           style={docco}
           className="rounded-xl"
           showLineNumbers={true}
