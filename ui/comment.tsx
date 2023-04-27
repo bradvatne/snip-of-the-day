@@ -3,11 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useSupabase } from "@/utils/browserClient";
 import { useRouter } from "next/navigation";
 import { Comment as CommentType } from "@/lib/database";
+import { Session } from "@supabase/supabase-js";
 
 type CommentProps = {
   snip_id: number;
   owner_id: string;
   author: string;
+  comments: CommentType[];
+  session: Session | null;
 };
 
 const formatDate = (date: Date) => {
@@ -18,23 +21,23 @@ const formatDate = (date: Date) => {
   });
 };
 
-const Comment = ({ snip_id, author, owner_id }: CommentProps) => {
+const Comment = ({
+  snip_id,
+  author,
+  owner_id,
+  comments,
+  session,
+}: CommentProps) => {
   const [comment, setComment] = useState<string>("");
-  const [commentData, setCommentData] = useState<CommentType[]>([]);
   const supabase = useSupabase();
   const router = useRouter();
-  useEffect(() => {
-    const fetchComments = async () => {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("snip_id", snip_id);
-      error ? console.log(error) : setCommentData(data);
-    };
-    fetchComments();
-  }, []);
 
   const submitComment = async () => {
+    if (comment.length < 1 || session === null) {
+      alert("Please login and fill out the comment form before submiting");
+      return;
+    }
+
     const { data, error } = await supabase.from("comments").insert({
       snip_id: snip_id,
       author: author,
@@ -56,6 +59,7 @@ const Comment = ({ snip_id, author, owner_id }: CommentProps) => {
           onChange={(e) => setComment(e.target.value)}
           className="w-full rounded-md p-2 border border-solid border-gray-400"
           placeholder="Add your comment..."
+          disabled={session === null ? true : false}
         ></textarea>
         <button
           className="bg-green-100 px-5 rounded justify-self-end ml-2"
@@ -64,7 +68,7 @@ const Comment = ({ snip_id, author, owner_id }: CommentProps) => {
           Post
         </button>
       </div>
-      {commentData.map((comment) => (
+      {comments.map((comment) => (
         <div key={comment.id}>
           <div className="flex justify-between items-end mt-2">
             <span>{comment.author} commented</span>

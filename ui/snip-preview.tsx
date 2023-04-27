@@ -8,9 +8,11 @@ import { useSupabase } from "../utils/browserClient";
 import { Session } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import Comment from "./comment";
+import { Comment as CommentType } from "../lib/database";
 
 type SnipPreviewProps = {
   snippet: Snip;
+  comments: CommentType[];
 };
 
 const formatDate = (date: Date) => {
@@ -21,7 +23,7 @@ const formatDate = (date: Date) => {
   });
 };
 
-function SnipPreview({ snippet }: SnipPreviewProps) {
+function SnipPreview({ snippet, comments }: SnipPreviewProps) {
   const { title, id, author, snip, description, created_at, owner_id } =
     snippet;
   const date = new Date(`${created_at}`);
@@ -51,8 +53,7 @@ function SnipPreview({ snippet }: SnipPreviewProps) {
       <div className="flex justify-between items-end">
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="text-xs">
-          Snipped {formatDate(date)} by{" "}
-          <button onClick={() => console.log(session)}>{author}</button>
+          Snipped {formatDate(date)} by {author}
         </div>
       </div>
       <div className="my-1 rounded-xl">
@@ -86,7 +87,13 @@ function SnipPreview({ snippet }: SnipPreviewProps) {
         </div>
       </div>
       {showComment && (
-        <Comment snip_id={id} author={`${author}`} owner_id={owner_id} />
+        <Comment
+          snip_id={id}
+          author={`${author}`}
+          owner_id={owner_id}
+          comments={comments}
+          session={session}
+        />
       )}
     </div>
   );

@@ -38,7 +38,7 @@ const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
       description,
       language,
       owner_id: session?.user.id,
-      author,
+      author: user ? user : author,
     });
     if (!user && session !== null) {
       const { data, error } = await supabase
