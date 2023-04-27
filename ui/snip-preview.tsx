@@ -4,7 +4,7 @@ import { Snip } from "@/lib/database";
 import React, { useState, useEffect, cache } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { useSupabase } from "../utils/browserClient";
+import { useSupabase } from "../lib/supabase-browser";
 import { Session } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import Comment from "./comment";

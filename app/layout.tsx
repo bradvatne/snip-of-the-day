@@ -1,11 +1,11 @@
 import "./globals.css";
 import Nav from "../ui/nav";
-import SupabaseProvider from "../utils/browserClient";
+import SupabaseProvider from "../lib/supabase-browser";
 import { store } from "../store";
 import { fetchInitialSnips } from "../store/snipsSlice";
-import supabase from "../lib/supabase";
+import serverClient from "../lib/supabase-server";
 import Preloader from "./Preloader";
-import { SnipWithComments as Snip } from "../lib/database";
+import SessionProvider from "./SesssionProvider";
 
 export const metadata = {
   title: "Create Next App",
@@ -17,6 +17,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = serverClient();
   async function getSnips() {
     const { data, error } = await supabase
       .from("snips")
@@ -25,7 +26,7 @@ export default async function RootLayout({
     return { data, error };
   }
   const { data } = await getSnips();
-  
+
   store.dispatch(fetchInitialSnips(data ?? []));
 
   return (
@@ -33,10 +34,12 @@ export default async function RootLayout({
       <body>
         <SupabaseProvider>
           <Preloader snips={data ?? []} />
-          <div className="max-w-xl mx-auto">
-            <Nav />
-            {children}
-          </div>
+          <SessionProvider>
+            <div className="max-w-xl mx-auto">
+              <Nav />
+              {children}
+            </div>
+          </SessionProvider>
         </SupabaseProvider>
       </body>
     </html>

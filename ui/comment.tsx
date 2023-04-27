@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSupabase } from "@/utils/browserClient";
+import { useSupabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { Comment as CommentType } from "@/lib/database";
 import { Session } from "@supabase/supabase-js";

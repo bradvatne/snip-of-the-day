@@ -1,17 +1,26 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { useSupabase } from "../utils/browserClient";
+import { useSupabase } from "../lib/supabase-browser";
 import { Session } from "@supabase/supabase-js";
+import { User } from "../lib/database";
 import AddSnip from "./add-snip";
+import { useSession } from "../app/SesssionProvider";
 
 export default function Nav() {
   const [checkEmail, setCheckEmail] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
   const [addSnip, setAddSnip] = useState(false);
-  const supabase = useSupabase();
+  const [session, setSession] = useState<Session | null | undefined>(null);
+  const [user, setUser] = useState<User | null | undefined>(null);
+  const [email, setEmail] = useState<string>("");
+  const sessionContext = useSession();
+  const getUser = sessionContext?.user ?? null;
+  const getSession = sessionContext?.session ?? null;
 
+  useEffect(() => {
+    setSession(getSession);
+    setUser(getUser);
+  }, [sessionContext]);
+  const supabase = useSupabase();
   const signIn = async (e: FormEvent) => {
     e.preventDefault();
     const { data, error } = await supabase.auth.signInWithOtp({
@@ -26,27 +35,10 @@ export default function Nav() {
     setSession(null);
   };
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (data !== null) {
-        setSession(data.session);
-        const res = await supabase
-          .from("profiles")
-          .select()
-          .eq("id", data && data.session && data.session.user.id)
-          .single();
-        setUser(res && res.data && res.data && res.data.first_name);
-        console.log(res, "here");
-      }
-    };
-    fetchSession();
-  }, []);
-
   return (
     <nav
       className="flex justify-between items-end flex-wrap"
-      onClick={() => console.log(user)}
+      onClick={() => console.log(session)}
     >
       <div className="text-2xl font-bold">Snip of the Day ✂️</div>
       {session && !checkEmail ? (
@@ -76,14 +68,7 @@ export default function Nav() {
           </button>
         </form>
       )}
-      {addSnip && (
-        <AddSnip
-          session={session}
-          user={user}
-          addSnip={addSnip}
-          setAddSnip={setAddSnip}
-        />
-      )}
+      {addSnip && <AddSnip addSnip={addSnip} setAddSnip={setAddSnip} />}
     </nav>
   );
 }

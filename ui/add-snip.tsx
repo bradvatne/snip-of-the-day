@@ -2,22 +2,18 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { useSupabase } from "../utils/browserClient";
+import { useSupabase } from "../lib/supabase-browser";
 import { Session } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { useSession } from "../app/SesssionProvider";
+import { User } from "../lib/database";
 
 type AddSnipProps = {
-  session: Session | null;
-  user: string | null;
   addSnip: boolean | null;
   setAddSnip: Function;
 };
 
-type User = {
-  first_name: string;
-};
-
-const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
+const AddSnip = ({ addSnip, setAddSnip }: AddSnipProps) => {
   const supabase = useSupabase();
   const [title, setTitle] = useState("");
   const [snip, setSnip] = useState("");
@@ -25,10 +21,22 @@ const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
   const [language, setLanguage] = useState("");
   const [author, setAuthor] = useState("");
   const router = useRouter();
+  const sessionContext = useSession();
+  const [user, setUser] = useState<User | null>();
+  const [session, setSession] = useState<Session | null>();
+
+  useEffect(() => {
+    setSession(sessionContext?.session);
+    setUser(sessionContext?.user);
+  }, [sessionContext]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (session === null) {
+      alert("Please login to add a snippet");
+      return;
+    }
+    if (user === null) {
       alert("Please login to add a snippet");
       return;
     }
@@ -37,14 +45,14 @@ const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
       snip,
       description,
       language,
-      owner_id: session?.user.id,
-      author: user ? user : author,
+      owner_id: session?.user.id ?? "",
+      author: user?.first_name,
     });
     if (!user && session !== null) {
       const { data, error } = await supabase
         .from("profiles")
         .update({ first_name: author })
-        .eq("id", session.user.id);
+        .eq("id", session?.user.id);
 
       error ? console.log(error) : console.log("updated name", data);
     }
@@ -116,7 +124,7 @@ const AddSnip = ({ setAddSnip, user, session }: AddSnipProps) => {
             placeholder="Enter your name..."
           />
         ) : (
-          `Posting as ${user}`
+          `Posting as ${user?.first_name}`
         )}
         <div className="flex gap-3 items-end">
           <label className="text-xs font-semibold" htmlFor="language">
