@@ -11,9 +11,11 @@ import { User } from "../lib/database";
 type AddSnipProps = {
   addSnip: boolean | null;
   setAddSnip: Function;
+  user: User | null | undefined;
+  session: Session | null | undefined;
 };
 
-const AddSnip = ({ addSnip, setAddSnip }: AddSnipProps) => {
+const AddSnip = ({ user, session, addSnip, setAddSnip }: AddSnipProps) => {
   const supabase = useSupabase();
   const [title, setTitle] = useState("");
   const [snip, setSnip] = useState("");
@@ -21,14 +23,6 @@ const AddSnip = ({ addSnip, setAddSnip }: AddSnipProps) => {
   const [language, setLanguage] = useState("");
   const [author, setAuthor] = useState("");
   const router = useRouter();
-  const sessionContext = useSession();
-  const [user, setUser] = useState<User | null>();
-  const [session, setSession] = useState<Session | null>();
-
-  useEffect(() => {
-    setSession(sessionContext?.session);
-    setUser(sessionContext?.user);
-  }, [sessionContext]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,15 +42,7 @@ const AddSnip = ({ addSnip, setAddSnip }: AddSnipProps) => {
       owner_id: session?.user.id ?? "",
       author: user?.first_name,
     });
-    if (!user && session !== null) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .update({ first_name: author })
-        .eq("id", session?.user.id);
-
-      error ? console.log(error) : console.log("updated name", data);
-    }
-
+   
     error ? console.log(error) : console.log("success!", data);
     if (!error) {
       setTitle("");

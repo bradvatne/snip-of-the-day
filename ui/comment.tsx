@@ -4,6 +4,7 @@ import { useSupabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { Comment as CommentType } from "@/lib/database";
 import { Session } from "@supabase/supabase-js";
+import { useSession } from "@/app/SesssionProvider";
 
 type CommentProps = {
   snip_id: number;
@@ -21,26 +22,25 @@ const formatDate = (date: Date) => {
   });
 };
 
-const Comment = ({
-  snip_id,
-  author,
-  owner_id,
-  comments,
-  session,
-}: CommentProps) => {
+const Comment = ({ snip_id, author, owner_id, comments }: CommentProps) => {
   const [comment, setComment] = useState<string>("");
   const supabase = useSupabase();
   const router = useRouter();
-
+  const ctx = useSession();
+  const { session, user } = ctx ?? { session: null, user: null };
   const submitComment = async () => {
-    if (comment.length < 1 || session === null) {
+    if (comment.length < 1 || session === null || user === null) {
       alert("Please login and fill out the comment form before submiting");
+      return;
+    }
+    if (user.first_name === null) {
+      alert("Username not found");
       return;
     }
 
     const { data, error } = await supabase.from("comments").insert({
       snip_id: snip_id,
-      author: author,
+      author: user?.first_name,
       owner_id: owner_id,
       content: comment,
     });
@@ -62,7 +62,7 @@ const Comment = ({
           disabled={session === null ? true : false}
         ></textarea>
         <div className="flex justify-between">
-          <span>Posting as {author}</span>{" "}
+          <span>Posting as {user?.first_name}</span>{" "}
           <button
             className="px-5 rounded justify-self-end ml-2"
             onClick={() => submitComment()}

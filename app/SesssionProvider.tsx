@@ -30,24 +30,10 @@ const SessionProvider = ({
   const supabase = useSupabase();
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select()
-        .eq("id", session?.user.id)
-        .single();
-      setUser(data);
-    };
-
     // Listen for session changes and update the state
     const sessionListener = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
-        if (session) {
-          getUser();
-        } else {
-          setUser(null);
-        }
       }
     );
 
@@ -56,6 +42,18 @@ const SessionProvider = ({
       sessionListener.data.subscription.unsubscribe();
     };
   }, [supabase.auth]);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select()
+        .eq("id", session?.user.id)
+        .single();
+      setUser(data);
+    };
+    getUser();
+  }, [session]);
 
   return (
     <SessionContext.Provider value={{ session, user }}>
